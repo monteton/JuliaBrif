@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ блога: 25 вопросов</title>
+    <style>
+        /* Общие стили */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Заголовки */
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #34495e;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* Стили для вопросов */
+        .question-block {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f4f8 100%);
+            border: 1px solid #e7eaf0;
+            transition: all 0.3s ease;
+        }
+
+        .question-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-text {
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+
+        .answers {
+            display: flex;
+            gap: 15px;
+        }
+
+        .answers input[type="radio"] {
+            display: none;
+        }
+
+        .answers label {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 2px solid #dce1e6;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .answers input[type="radio"]:checked + label {
+            color: #fff;
+            border-color: #3498db;
+            background-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .answers label.yes:hover { border-color: #e74c3c; }
+        .answers input[type="radio"][value="yes"]:checked + label.yes { background-color: #e74c3c; border-color: #e74c3c; }
+        
+        .answers label.no:hover { border-color: #2ecc71; }
+        .answers input[type="radio"][value="no"]:checked + label.no { background-color: #2ecc71; border-color: #2ecc71; }
+
+
+        /* Кнопки */
+        .submit-btn, .cta-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            background-color: #8e44ad;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            margin-top: 30px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .submit-btn:hover {
+            background-color: #9b59b6;
+            transform: translateY(-2px);
+        }
+        
+        .cta-btn {
+            background-color: #e67e22;
+        }
+        .cta-btn:hover {
+            background-color: #d35400;
+            transform: translateY(-2px);
+        }
+        
+        .cta-btn-good {
+            background-color: #27ae60;
+        }
+        .cta-btn-good:hover {
+             background-color: #229954;
+        }
+
+        /* Секция результатов */
+        #results {
+            display: none;
+            margin-top: 40px;
+            padding: 25px 30px;
+            border-radius: 12px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        #results h3 {
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        #results p {
+            font-size: 16px;
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.7;
+        }
+        
+        .results-good { background-color: #e8f5e9; border: 1px solid #c8e6c9; }
+        .results-good h3 { color: #2e7d32; }
+        
+        .results-medium { background-color: #fff3e0; border: 1px solid #ffe0b2; }
+        .results-medium h3 { color: #f57c00; }
+        
+        .results-bad { background-color: #ffebee; border: 1px solid #ffcdd2; }
+        .results-bad h3 { color: #c62828; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #error-message {
+            color: #c0392b;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Почему подписчики смотрят, но не торопятся покупать?</h1>
+        <p class="subtitle">Бриф для анализа блога: 25 вопросов (ответы займут ~3 минуты)</p>
+
+        <form id="quizForm">
+            <!-- Раздел 1 -->
+            <h2>Раздел 1. Личность и экспертность</h2>
+            <div class="question-block">
+                <p class="question-text">1. Ваш контент в основном состоит из фотографий личной жизни (отдых, семья, еда) без транслирования к вашей экспертности?</p>
+                <div class="answers">
+                    <input type="radio" id="q1_yes" name="q1" value="yes"><label for="q1_yes" class="yes">Да</label>
+                    <input type="radio" id="q1_no" name="q1" value="no"><label for="q1_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">2. Вы боитесь открыто транслировать свои ценности и взгляды на жизнь, опасаясь осуждения и хейта?</p>
+                <div class="answers">
+                    <input type="radio" id="q2_yes" name="q2" value="yes"><label for="q2_yes" class="yes">Да</label>
+                    <input type="radio" id="q2_no" name="q2" value="no"><label for="q2_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">3. Вы не знаете как проявляться в блоге именно вам, какое позиционирование выбрать, какие смыслы транслировать?</p>
+                <div class="answers">
+                    <input type="radio" id="q3_yes" name="q3" value="yes"><label for="q3_yes" class="yes">Да</label>
+                    <input type="radio" id="q3_no" name="q3" value="no"><label for="q3_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">4. Вам сложно говорить о своих достижениях, наградах и сильных сторонах?</p>
+                <div class="answers">
+                    <input type="radio" id="q4_yes" name="q4" value="yes"><label for="q4_yes" class="yes">Да</label>
+                    <input type="radio" id="q4_no" name="q4" value="no"><label for="q4_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">5. Вы стесняетесь или боитесь показывать результаты своих клиентов?</p>
+                <div class="answers">
+                    <input type="radio" id="q5_yes" name="q5" value="yes"><label for="q5_yes" class="yes">Да</label>
+                    <input type="radio" id="q5_no" name="q5" value="no"><label for="q5_no" class="no">Нет</label>
+                </div>
+            </div>
+
+            <!-- Раздел 2 -->
+            <h2>Раздел 2. Целевая аудитория и спрос</h2>
+            <div class="question-block">
+                <p class="question-text">6. Вы не знаете, кто ваша целевая аудитория, и считаете, что ваши услуги нужны всем?</p>
+                <div class="answers">
+                    <input type="radio" id="q6_yes" name="q6" value="yes"><label for="q6_yes" class="yes">Да</label>
+                    <input type="radio" id="q6_no" name="q6" value="no"><label for="q6_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">7. Вы не знаете, какие проблемы, "боли", желания есть у каждого сегмента вашей аудитории?</p>
+                <div class="answers">
+                    <input type="radio" id="q7_yes" name="q7" value="yes"><label for="q7_yes" class="yes">Да</label>
+                    <input type="radio" id="q7_no" name="q7" value="no"><label for="q7_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">8. Вы не формируете спрос на свои услуги, а просто ждёте, когда клиенты придут сами?</p>
+                <div class="answers">
+                    <input type="radio" id="q8_yes" name="q8" value="yes"><label for="q8_yes" class="yes">Да</label>
+                    <input type="radio" id="q8_no" name="q8" value="no"><label for="q8_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">9. Вы не создаёте уникальное торговое предложение и не объясняете, чем отличаетесь от конкурентов?</p>
+                <div class="answers">
+                    <input type="radio" id="q9_yes" name="q9" value="yes"><label for="q9_yes" class="yes">Да</label>
+                    <input type="radio" id="q9_no" name="q9" value="no"><label for="q9_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">10. Вы не объясняете аудитории, как ваш продукт решит их конкретные проблемы?</p>
+                <div class="answers">
+                    <input type="radio" id="q10_yes" name="q10" value="yes"><label for="q10_yes" class="yes">Да</label>
+                    <input type="radio" id="q10_no" name="q10" value="no"><label for="q10_no" class="no">Нет</label>
+                </div>
+            </div>
+
+            <!-- Раздел 3 -->
+            <h2>Раздел 3. Контент и продажи</h2>
+             <div class="question-block">
+                <p class="question-text">11. Вы публикуете контент без чёткого плана, по настроению или когда есть свободное время?</p>
+                <div class="answers">
+                    <input type="radio" id="q11_yes" name="q11" value="yes"><label for="q11_yes" class="yes">Да</label>
+                    <input type="radio" id="q11_no" name="q11" value="no"><label for="q11_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">12. Перед публикацией контента вы не задаёте себе вопросы: "Зачем я это делаю?" и "Как это приведёт к продаже?"</p>
+                <div class="answers">
+                    <input type="radio" id="q12_yes" name="q12" value="yes"><label for="q12_yes" class="yes">Да</label>
+                    <input type="radio" id="q12_no" name="q12" value="no"><label for="q12_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">13. Ваш контент не привязан к конкретным задачам и целям по доходу?</p>
+                <div class="answers">
+                    <input type="radio" id="q13_yes" name="q13" value="yes"><label for="q13_yes" class="yes">Да</label>
+                    <input type="radio" id="q13_no" name="q13" value="no"><label for="q13_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">14. Вы не ведёте аудиторию по "воронке продаж", а сразу призываете купить?</p>
+                <div class="answers">
+                    <input type="radio" id="q14_yes" name="q14" value="yes"><label for="q14_yes" class="yes">Да</label>
+                    <input type="radio" id="q14_no" name="q14" value="no"><label for="q14_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">15. У вас нет отдельного контента, направленного на работу с возражениями?</p>
+                <div class="answers">
+                    <input type="radio" id="q15_yes" name="q15" value="yes"><label for="q15_yes" class="yes">Да</label>
+                    <input type="radio" id="q15_no" name="q15" value="no"><label for="q15_no" class="no">Нет</label>
+                </div>
+            </div>
+
+            <!-- Раздел 4 -->
+            <h2>Раздел 4. Общие ошибки</h2>
+            <div class="question-block">
+                <p class="question-text">16. Вы копируете контент и идеи других экспертов, а не создаёте свой уникальный?</p>
+                <div class="answers">
+                    <input type="radio" id="q16_yes" name="q16" value="yes"><label for="q16_yes" class="yes">Да</label>
+                    <input type="radio" id="q16_no" name="q16" value="no"><label for="q16_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">17. Вы не анализируете, какой контент у вас работает, а какой — нет?</p>
+                <div class="answers">
+                    <input type="radio" id="q17_yes" name="q17" value="yes"><label for="q17_yes" class="yes">Да</label>
+                    <input type="radio" id="q17_no" name="q17" value="no"><label for="q17_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">18. Вы не изучаете свою статистику и не делаете выводы?</p>
+                <div class="answers">
+                    <input type="radio" id="q18_yes" name="q18" value="yes"><label for="q18_yes" class="yes">Да</label>
+                    <input type="radio" id="q18_no" name="q18" value="no"><label for="q18_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">19. Вы редко общаетесь с подписчиками в комментариях и директе?</p>
+                <div class="answers">
+                    <input type="radio" id="q19_yes" name="q19" value="yes"><label for="q19_yes" class="yes">Да</label>
+                    <input type="radio" id="q19_no" name="q19" value="no"><label for="q19_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">20. Вы считаете, что личный бренд — это что-то, что создаётся само собой и не требует усилий?</p>
+                <div class="answers">
+                    <input type="radio" id="q20_yes" name="q20" value="yes"><label for="q20_yes" class="yes">Да</label>
+                    <input type="radio" id="q20_no" name="q20" value="no"><label for="q20_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">21. Вы редко используете в контенте отзывы или кейсы, чтобы доказать свою экспертность?</p>
+                <div class="answers">
+                    <input type="radio" id="q21_yes" name="q21" value="yes"><label for="q21_yes" class="yes">Да</label>
+                    <input type="radio" id="q21_no" name="q21" value="no"><label for="q21_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">22. Вы не проводите опросы или не задаёте прямые вопросы аудитории, чтобы узнать, что им интересно?</p>
+                <div class="answers">
+                    <input type="radio" id="q22_yes" name="q22" value="yes"><label for="q22_yes" class="yes">Да</label>
+                    <input type="radio" id="q22_no" name="q22" value="no"><label for="q22_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">23. Вы не используете законы сторителлинга и сценаристики, чтобы сделать свой контент более эмоциональным?</p>
+                <div class="answers">
+                    <input type="radio" id="q23_yes" name="q23" value="yes"><label for="q23_yes" class="yes">Да</label>
+                    <input type="radio" id="q23_no" name="q23" value="no"><label for="q23_no" class="no">Нет</label>
+                </div>
+            </div>
+             <div class="question-block">
+                <p class="question-text">24. Вы считаете, что вам не нужно постоянно обучаться, развиваться и показывать это аудитории?</p>
+                <div class="answers">
+                    <input type="radio" id="q24_yes" name="q24" value="yes"><label for="q24_yes" class="yes">Да</label>
+                    <input type="radio" id="q24_no" name="q24" value="no"><label for="q24_no" class="no">Нет</label>
+                </div>
+            </div>
+            <div class="question-block">
+                <p class="question-text">25. Вы не используете офферы и триггерные смыслы, которые работают именно на вашу аудиторию?</p>
+                <div class="answers">
+                    <input type="radio" id="q25_yes" name="q25" value="yes"><label for="q25_yes" class="yes">Да</label>
+                    <input type="radio" id="q25_no" name="q25" value="no"><label for="q25_no" class="no">Нет</label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Узнать результат</button>
+            <p id="error-message">Пожалуйста, ответьте на все вопросы, чтобы увидеть результат.</p>
+        </form>
+
+        <div id="results">
+            <!-- Содержимое генерируется скриптом -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('quizForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const totalQuestions = 25; // <-- Обновлено на 25
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const errorMessage = document.getElementById('error-message');
+
+            if (answeredQuestions < totalQuestions) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            errorMessage.style.display = 'none';
+
+            const yesAnswers = document.querySelectorAll('input[type="radio"][value="yes"]:checked').length;
+            
+            const resultsDiv = document.getElementById('results');
+            let resultHTML = '';
+            
+            const consultationLink = '#';
+
+            if (yesAnswers <= 5) {
+                // Хороший результат (0-5 "Да")
+                resultsDiv.className = 'results-good';
+                resultHTML = `
+                    <h3>Отличный результат! Вы на верном пути!</h3>
+                    <p>Вы прекрасно понимаете, как выстраивать личный бренд и взаимодействовать с аудиторией. У вас есть прочный фундамент и система в работе.</p>
+                    <p><strong>Но нет предела совершенству.</strong> Если вы хотите не просто поддерживать результат, а масштабировать его, найти неочевидные точки роста и усилить свою стратегию, чтобы обойти конкурентов — приглашаю вас на консультацию. Вместе мы сможем сделать ваши сильные стороны еще сильнее.</p>
+                    <a href="${consultationLink}" class="cta-btn cta-btn-good">Усилить результаты</a>
+                `;
+            } else if (yesAnswers > 5 && yesAnswers <= 10) {
+                 // Средний результат (6-10 "Да")
+                resultsDiv.className = 'results-medium';
+                resultHTML = `
+                    <h3>Есть над чем поработать!</h3>
+                    <p>Вы уже делаете шаги в правильном направлении, однако некоторые аспекты ведения блога и продаж упускаются. Это мешает вам полностью раскрыть свой потенциал и увеличить доход.</p>
+                    <p><strong>Бесплатная консультация — это ваш шанс</strong> найти "слепые зоны" в стратегии и получить точечные рекомендации, которые помогут быстро исправить ошибки и ускорить рост вашего дохода. Давайте вместе превратим ваши усилия в реальные продажи.</p>
+                    <a href="${consultationLink}" class="cta-btn">Записаться на консультацию</a>
+                `;
+            } else {
+                 // Плохой результат (более 10 "Да")
+                resultsDiv.className = 'results-bad';
+                resultHTML = `
+                    <h3>Вам срочно нужны системные знания!</h3>
+                    <p>Результаты показывают, что вы действуете интуитивно и упускаете ключевые элементы, которые превращают подписчиков в клиентов. Ваш блог пока не работает как система для продаж, из-за чего вы теряете время и деньги.</p>
+                    <p><strong>Не отчаивайтесь, это поправимо!</strong> На бесплатной диагностической консультации мы разберем вашу ситуацию, выявим главные ошибки и составим пошаговый план действий. Это самый быстрый способ перестать работать впустую и начать выстраивать систему, которая приносит стабильный доход.</p>
+                    <a href="${consultationLink}" class="cta-btn">Записаться на консультацию</a>
+                `;
+            }
+            
+            resultsDiv.innerHTML = resultHTML;
+            resultsDiv.style.display = 'block';
+            
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    </script>
+
+</body>
+</html>
